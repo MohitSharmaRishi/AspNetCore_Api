@@ -5,3 +5,4 @@
 /.vs
 /DemoApi/.vs/DemoApi
 /DemoApi/DemoApi/obj
+/DemoApi/DemoApi/bin/Debug/net6.0
