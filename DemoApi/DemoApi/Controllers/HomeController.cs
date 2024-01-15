@@ -19,7 +19,7 @@ namespace DemoApi.Controllers
             _cache=  cache;
             _cacheOptions = new MemoryCacheEntryOptions()
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(10)
             };
         }
         [Route("")]
@@ -57,7 +57,7 @@ namespace DemoApi.Controllers
             var result = JsonConvert.DeserializeObject<List<int>>(response.Content.ReadAsStringAsync().Result);
             if (result == null || result.Count==0) return null;
 
-            foreach (var item in result.Take(200).ToList())
+            foreach (var item in result.Take(50).ToList())
             {
                 response = _client.GetAsync($"https://hacker-news.firebaseio.com/v0/item/{item}.json?print=pretty").Result;
                 Story story = JsonConvert.DeserializeObject<Story>(response.Content.ReadAsStringAsync().Result);
