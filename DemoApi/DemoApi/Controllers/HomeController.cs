@@ -14,7 +14,7 @@ namespace DemoApi.Controllers
         HttpClient _client;
         readonly IMemoryCache _cache;
         MemoryCacheEntryOptions _cacheOptions;
-        public HomeController() { }
+        
         public HomeController(IMemoryCache cache)
         {
             _cache=  cache;
@@ -50,7 +50,7 @@ namespace DemoApi.Controllers
             return Ok(stories);
            
         }
-        
+        [NonAction]
         public async Task<List<Story>> GetDataFromApi()
         {
             List<Story> stories = new List<Story>();
