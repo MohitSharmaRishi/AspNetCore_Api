@@ -23,13 +23,15 @@ namespace DemoApi.Controllers
                 AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(10)
             };
         }
-        [Route("")]
+        
+        [HttpGet("")]
         public IActionResult Index()
         {
             return Ok("Server Is Online");
 
         }
-        [Route("fetch")]
+        
+        [HttpGet("fetch")]
         public async Task<IActionResult> Fetch()
         {
             List<Story> stories;
