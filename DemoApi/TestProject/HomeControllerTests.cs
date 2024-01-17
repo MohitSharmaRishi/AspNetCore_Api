@@ -9,36 +9,32 @@ namespace TestProject
     public class HomeControllerTests
     {
         MemoryCacheOptions _cacheOptions;
-        private readonly Mock<IMemoryCache> _cache=new Mock<IMemoryCache>();
+        MemoryCache _cache = new MemoryCache(new MemoryCacheOptions() { });
         public HomeControllerTests()
         {
-            //_cacheOptions = new MemoryCacheOptions()
-            //{
-                 
-            //};
-            //_cache =new MemoryCache(_cacheOptions);
+            
         }
         [Fact]
         public void Check_Index_Output()
         {
 
-            HomeController controller = new HomeController(_cache.Object);
+            HomeController controller = new HomeController(_cache);
             IActionResult op = controller.Index();
             Assert.NotNull(op);
         }
         [Fact]
         public void Check_Fetch_Output()
         {
-
-            HomeController controller = new HomeController(_cache.Object);
-            IActionResult op = controller.Index();
+            
+            HomeController controller = new HomeController(_cache);
+            var op = controller.Fetch().Result;
             Assert.NotNull(op);
         }
 
 
         [Fact]
         public void GetDataFromApi_Output() { 
-        HomeController controller = new HomeController(_cache.Object);
+        HomeController controller = new HomeController(_cache);
             List<Story> op = controller.GetDataFromApi().Result;
             Assert.NotNull(op);
         }

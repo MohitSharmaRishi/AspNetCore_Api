@@ -32,12 +32,11 @@ namespace DemoApi.Controllers
         [Route("fetch")]
         public async Task<IActionResult> Fetch()
         {
-            DateTime dateTime;
             List<Story> stories;
             bool HasData = _cache.TryGetValue( "stories", out stories);
             if(!HasData)
             {
-                stories = await GetDataFromApi()    ;
+                stories = await GetDataFromApi();
                 _cache.Set("stories", stories, _cacheOptions);
             }
             else
@@ -59,7 +58,7 @@ namespace DemoApi.Controllers
             var result = JsonConvert.DeserializeObject<List<int>>(response.Content.ReadAsStringAsync().Result);
             if (result == null || result.Count==0) return null;
 
-            foreach (var item in result.Take(50).ToList())
+            foreach (var item in result.Take(200).ToList())
             {
                 response = _client.GetAsync($"https://hacker-news.firebaseio.com/v0/item/{item}.json?print=pretty").Result;
                 Story story = JsonConvert.DeserializeObject<Story>(response.Content.ReadAsStringAsync().Result);
