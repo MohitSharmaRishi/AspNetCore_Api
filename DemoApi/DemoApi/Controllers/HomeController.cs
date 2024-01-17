@@ -56,7 +56,7 @@ namespace DemoApi.Controllers
             _client = new HttpClient();
             var response = _client.GetAsync("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty").Result;
             var result = JsonConvert.DeserializeObject<List<int>>(response.Content.ReadAsStringAsync().Result);
-            if (result == null || result.Count==0) return null;
+            if (result == null || result.Count==0) return stories;
 
             foreach (var item in result.Take(200).ToList())
             {
