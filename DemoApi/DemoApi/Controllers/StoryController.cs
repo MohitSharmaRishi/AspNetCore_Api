@@ -9,13 +9,13 @@ namespace DemoApi.Controllers
 {
     [Route("")]
     [ApiController]
-    public class HomeController : ControllerBase
+    public class StoryController : ControllerBase
     {
         HttpClient _client;
         readonly IMemoryCache _cache;
         MemoryCacheEntryOptions _cacheOptions;
         
-        public HomeController(IMemoryCache cache)
+        public StoryController(IMemoryCache cache)
         {
             _cache=  cache;
             _cacheOptions = new MemoryCacheEntryOptions()
@@ -38,7 +38,7 @@ namespace DemoApi.Controllers
             bool HasData = _cache.TryGetValue( "stories", out stories);
             if(!HasData)
             {
-                stories = await GetDataFromApi();
+                stories = await GetStories();
                 _cache.Set("stories", stories, _cacheOptions);
             }
             else
@@ -52,7 +52,7 @@ namespace DemoApi.Controllers
            
         }
         [NonAction]
-        public async Task<List<Story>> GetDataFromApi()
+        public async Task<List<Story>> GetStories()
         {
             List<Story> stories = new List<Story>();
             _client = new HttpClient();
@@ -62,13 +62,35 @@ namespace DemoApi.Controllers
 
             foreach (var item in result.Take(200).ToList())
             {
-                response = _client.GetAsync($"https://hacker-news.firebaseio.com/v0/item/{item}.json?print=pretty").Result;
-                Story story = JsonConvert.DeserializeObject<Story>(response.Content.ReadAsStringAsync().Result);
+                Story story = await FetchSingleRecord(item);
+                if (story == null) continue;
                 stories.Add(story);
             }
-
             _client.Dispose();
             return stories;
+        }
+        [HttpGet("fetch/{ID}")]
+        public async Task<Story> FetchSingleRecord(int ID)
+        {
+            string Url = $"https://hacker-news.firebaseio.com/v0/item/{ID.ToString()}.json?print=pretty";
+            Story? story;
+            HttpClient client = new HttpClient();
+            using (var response = await client.GetAsync(Url))
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                if (result == null) return null;
+                try
+                {
+                    story = JsonConvert.DeserializeObject<Story>(result);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+            client.Dispose();
+            return story;
+            
         }
 
     }

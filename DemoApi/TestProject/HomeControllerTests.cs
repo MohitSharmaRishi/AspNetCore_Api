@@ -15,27 +15,36 @@ namespace TestProject
             
         }
         [Fact]
-        public void Check_Index_Output()
+        public void Index_Output_Should_Not_Be_Null()
         {
 
-            HomeController controller = new HomeController(_cache);
+            StoryController controller = new StoryController(_cache);
             IActionResult op = controller.Index();
             Assert.NotNull(op);
         }
         [Fact]
-        public void Check_Fetch_Output()
+        public void Fetch_Output_Should_Not_Be_Null()
         {
             
-            HomeController controller = new HomeController(_cache);
+            StoryController controller = new StoryController(_cache);
             var op = controller.Fetch().Result;
             Assert.NotNull(op);
         }
 
 
         [Fact]
-        public void GetDataFromApi_Output() { 
-        HomeController controller = new HomeController(_cache);
-            List<Story> op = controller.GetDataFromApi().Result;
+        public void GetDataFromApi_Output_Should_Not_Be_Null()
+        {
+            StoryController controller = new StoryController(_cache);
+            List<Story> op = controller.GetStories().Result;
+            Assert.NotNull(op);
+        }
+        [Fact]
+        public void FetchSingleRecord_Output_Should_Not_Be_Null()
+        {
+            int ID = 39036842;
+            StoryController controller = new StoryController(_cache);
+            Story op = controller.FetchSingleRecord(ID).Result;
             Assert.NotNull(op);
         }
     }
