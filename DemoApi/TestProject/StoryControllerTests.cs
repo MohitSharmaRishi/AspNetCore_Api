@@ -1,18 +1,20 @@
 using DemoApi.Controllers;
 using DemoApi.Models;
+using DemoApi.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace TestProject
 {
-    public class HomeControllerTests
+    public class StoryControllerTests
     {
         MemoryCacheOptions _cacheOptions;
         MemoryCache _cache = new MemoryCache(new MemoryCacheOptions() { });
-        public HomeControllerTests()
+        Mock<IStoryRepo> mockStoryRepo;
+        public StoryControllerTests()
         {
-            
+            mockStoryRepo=new Mock<IStoryRepo> ();
         }
         [Fact]
         public void Index_Output_Should_Not_Be_Null()
@@ -33,7 +35,7 @@ namespace TestProject
 
 
         [Fact]
-        public void GetDataFromApi_Output_Should_Not_Be_Null()
+        public void GetStories_Output_Should_Not_Be_Null()
         {
             StoryController controller = new StoryController(_cache);
             List<Story> op = controller.GetStories().Result;

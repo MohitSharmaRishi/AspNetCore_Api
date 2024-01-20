@@ -1,4 +1,5 @@
 ﻿using DemoApi.Models;
+using DemoApi.Repos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -14,10 +15,11 @@ namespace DemoApi.Controllers
         HttpClient _client;
         readonly IMemoryCache _cache;
         MemoryCacheEntryOptions _cacheOptions;
-        
-        public StoryController(IMemoryCache cache)
+        private readonly IStoryRepo _storyRepo;
+        public StoryController(IMemoryCache cache, IStoryRepo storyRepo)
         {
-            _cache=  cache;
+            _storyRepo = storyRepo;
+            _cache =  cache;
             _cacheOptions = new MemoryCacheEntryOptions()
             {
                 AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(10)
@@ -43,7 +45,6 @@ namespace DemoApi.Controllers
             }
             else
             {
-                        
                 stories =(List<Story>) _cache.Get("stories");
             }
 
@@ -54,42 +55,21 @@ namespace DemoApi.Controllers
         [NonAction]
         public async Task<List<Story>> GetStories()
         {
-            List<Story> stories = new List<Story>();
-            _client = new HttpClient();
-            var response = _client.GetAsync("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty").Result;
-            var result = JsonConvert.DeserializeObject<List<int>>(response.Content.ReadAsStringAsync().Result);
-            if (result == null || result.Count==0) return stories;
 
-            foreach (var item in result.Take(200).ToList())
+            List<int> StoryIDs = await _storyRepo.GetStoryIDs();
+            List<Story> stories = new List<Story>();
+            foreach (int storyID in StoryIDs)
             {
-                Story story = await FetchSingleRecord(item);
+                Story story = await _storyRepo.GetStoryByID(storyID);
                 if (story == null) continue;
                 stories.Add(story);
             }
-            _client.Dispose();
             return stories;
         }
         [HttpGet("fetch/{ID}")]
-        public async Task<Story> FetchSingleRecord(int ID)
+        public async Task<Story> GetStoryByID(int ID)
         {
-            string Url = $"https://hacker-news.firebaseio.com/v0/item/{ID.ToString()}.json?print=pretty";
-            Story? story;
-            HttpClient client = new HttpClient();
-            using (var response = await client.GetAsync(Url))
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                if (result == null) return null;
-                try
-                {
-                    story = JsonConvert.DeserializeObject<Story>(result);
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-            client.Dispose();
-            return story;
+            return await _storyRepo.GetStoryByID(ID);
             
         }
 
