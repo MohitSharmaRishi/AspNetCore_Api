@@ -56,16 +56,18 @@ namespace DemoApi.Controllers
         public async Task<List<Story>> GetStories()
         {
 
-            List<int> StoryIDs = await _storyRepo.GetStoryIDs();
-            List<Story> stories = new List<Story>();
-            foreach (int storyID in StoryIDs)
-            {
-                Story story = await _storyRepo.GetStoryByID(storyID);
-                if (story == null) continue;
-                stories.Add(story);
-            }
-            return stories;
+            return await _storyRepo.GetStories();
+
         }
+        [NonAction]
+        public async Task<List<int>> GetStoryIDs()
+        {
+
+            return await _storyRepo.GetStoryIDs();
+
+        }
+
+
         [HttpGet("fetch/{ID}")]
         public async Task<Story> GetStoryByID(int ID)
         {

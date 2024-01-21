@@ -26,12 +26,25 @@ namespace DemoApi.Repos
             client.Dispose();
             return story;
         }
+        public async Task<List<Story>> GetStories()
+        {
+            List<int> StoryIDs =await this.GetStoryIDs();
+            List<Story> stories = new List<Story>();
+            foreach (int storyID in StoryIDs)
+            {
+                Story story = await this.GetStoryByID(storyID);
+                if (story == null) continue;
+                stories.Add(story);
+            }
+            return stories;
+        }
+
 
         public async Task<List<int>> GetStoryIDs()
         {
-            List<Story> stories = new List<Story>();
+
             HttpClient _client = new HttpClient();
-            var response = _client.GetAsync("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty").Result;
+            var response = await _client.GetAsync("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
             var result = JsonConvert.DeserializeObject<List<int>>(response.Content.ReadAsStringAsync().Result);
             return result;
         }
@@ -41,5 +54,6 @@ namespace DemoApi.Repos
     {
         Task<Story> GetStoryByID(int ID);
         Task<List<int>> GetStoryIDs();
+    Task<List<Story>> GetStories();
     }
 }
