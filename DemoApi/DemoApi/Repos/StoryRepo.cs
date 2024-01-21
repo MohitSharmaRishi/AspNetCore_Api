@@ -9,6 +9,11 @@ namespace DemoApi.Repos
 {
     public class StoryRepo : IStoryRepo
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns>This method will return Single Story record for the given Story number / ID</returns>
         public async Task<Story> GetStoryByID(int ID)
         {
             string Url = $"https://hacker-news.firebaseio.com/v0/item/{ID.ToString()}.json?print=pretty";
@@ -30,6 +35,11 @@ namespace DemoApi.Repos
             client.Dispose();
             return story;
         }
+
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <returns>This Method will return 200 Stories from Api</returns>
         public async Task<List<Story>> GetStories()
         {
             HttpClient client = new HttpClient();
@@ -70,8 +80,12 @@ namespace DemoApi.Repos
 
             return stories;
         }
-
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>This method will return numerical IDs of stories
+        /// </returns>
         public async Task<List<int>> GetStoryIDs()
         {
 
@@ -84,6 +98,7 @@ namespace DemoApi.Repos
 
     public interface IStoryRepo
     {
+
         Task<Story> GetStoryByID(int ID);
         Task<List<int>> GetStoryIDs();
         Task<List<Story>> GetStories();
