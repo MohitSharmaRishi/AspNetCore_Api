@@ -1,5 +1,9 @@
 ﻿using DemoApi.Models;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DemoApi.Repos
 {
@@ -28,14 +32,42 @@ namespace DemoApi.Repos
         }
         public async Task<List<Story>> GetStories()
         {
+            HttpClient client = new HttpClient();
             List<int> StoryIDs =await this.GetStoryIDs();
+            List<Task<string>> tasks = new List<Task<string>>();
             List<Story> stories = new List<Story>();
-            foreach (int storyID in StoryIDs)
+
+            foreach (var ID in StoryIDs.Take(200))
             {
-                Story story = await this.GetStoryByID(storyID);
-                if (story == null) continue;
-                stories.Add(story);
+                async Task<string> func()
+                {
+                    var response = await client.GetAsync($"https://hacker-news.firebaseio.com/v0/item/{ID.ToString()}.json?print=pretty");
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+                tasks.Add(func());
             }
+            await Task.WhenAll(tasks);
+
+            var postResponses = new List<string>();
+
+            foreach (var t in tasks)
+            {
+                var postResponse = await t; //t.Result would be okay too.
+                Story story;
+                try
+                {
+                    story = JsonConvert.DeserializeObject<Story>(postResponse);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                stories.Add(story);
+                
+            }
+
+
             return stories;
         }
 
@@ -54,6 +86,6 @@ namespace DemoApi.Repos
     {
         Task<Story> GetStoryByID(int ID);
         Task<List<int>> GetStoryIDs();
-    Task<List<Story>> GetStories();
+        Task<List<Story>> GetStories();
     }
 }

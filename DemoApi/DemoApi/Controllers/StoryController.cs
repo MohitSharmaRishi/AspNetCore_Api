@@ -55,9 +55,7 @@ namespace DemoApi.Controllers
         [NonAction]
         public async Task<List<Story>> GetStories()
         {
-
             return await _storyRepo.GetStories();
-
         }
         [NonAction]
         public async Task<List<int>> GetStoryIDs()
